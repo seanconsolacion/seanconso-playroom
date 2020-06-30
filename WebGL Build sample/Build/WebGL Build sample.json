@@ -1,0 +1,16 @@
+{
+"companyName": "DefaultCompany",
+"productName": "Virtual booth",
+"productVersion": "0.1",
+"dataUrl": "WebGL Build sample.data.unityweb",
+"wasmCodeUrl": "WebGL Build sample.wasm.code.unityweb",
+"wasmFrameworkUrl": "WebGL Build sample.wasm.framework.unityweb",
+"graphicsAPI": ["WebGL 2.0","WebGL 1.0"],
+"webglContextAttributes": {"preserveDrawingBuffer": false},
+"splashScreenStyle": "Dark",
+"backgroundColor": "#231F20",
+"cacheControl": {"default": "must-revalidate"},
+"developmentBuild": false,
+"multithreading": false,
+"unityVersion": "2019.2.12f1"
+}
