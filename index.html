@@ -3,49 +3,71 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | Patintero</title>
+    <title>Unity WebGL Player | Holen</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <script src="TemplateData/UnityProgress.js"></script>
     <script src="Build/UnityLoader.js"></script>
+    <script>
+    </script>
   </head>
   <body>
     <div id="webgl-content" class="unity-desktop">
       <div id="unityContainer" style="width: 450px; height: 800px"></div>
         <script>
 
-            //JS CALLBACKS
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            function isIOS() {
+                if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            function isAndroid() {
+                return (/android/i.test(userAgent));
+            }
+            function sendMessageToUnity(message) {
+                if (isIOS()) {
+                    try {
+                        webkit.messageHandlers.UnityInAppBrowser.postMessage(message);
+                    } catch (err) {
+                        console.log('Can not reach native code');
+                    }
+                } else if (isAndroid()) {
+                    UnityInAppBrowser.sendMessageFromJS(message);
+                }
+            }
             function ExitGame() {
-                window.location.href = "ayos://Exit";
+                sendMessageToUnity("Exit");
             }
             function PlayBGM() {
-                window.location.href = "ayos://PlayBGM"
+                //window.location.href = "ayos://PlayBGM"
+                sendMessageToUnity("PlayBGM");
             }
             function EnableBGM() {
-                window.location.href = "ayos://ToggleBGM?status=On";
+                //window.location.href = "ayos://ToggleBGM?status=On";
+                sendMessageToUnity("ToggleBGMOn");
             }
             function DisableBGM() {
-                window.location.href = "ayos://ToggleBGM?status=Off";
+                //window.location.href = "ayos://ToggleBGM?status=Off";
+                sendMessageToUnity("ToggleBGMOff");
             }
 
-            //UNITY LOADER AND RESPONSIVENESS
-            var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Patintero.json", { onProgress: UnityProgress });
+            //MAIN UNITY LOADER
+            var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Holen_WebGL_04282021.json", { onProgress: UnityProgress });
 
             var canvas = document.querySelector("#unityContainer");
             var content = document.querySelector("#webgl-content");
 
             function Resize() {
-                try {
-                    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-                        content.className = "unity-mobile";
-                        canvas.style.width = "100%";
-                        canvas.style.height = "100%";
-                    } else {
-                        canvas.style.width = "450px";
-                        canvas.style.height = "800px";
-                    }
-                } catch (err) {
-                    alert("Error in Responsiveness | Error: " + err.message);
+                if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                    content.className = "unity-mobile";
+                    canvas.style.width = "100%";
+                    canvas.style.height = "100%";
+                } else {
+                    canvas.style.width = "450px";
+                    canvas.style.height = "800px";
                 }
             }
             Resize();
@@ -74,10 +96,10 @@
                 if (progress == 1) {
                     unityInstance.logo.style.display = unityInstance.progress.style.display = "none";
                     Resize();
-                    PlayBGM();
                 }
             }
         </script>
     </div>
+
   </body>
 </html>
