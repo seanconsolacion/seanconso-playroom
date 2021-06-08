@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | Holen</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="TemplateData/UnityProgress.js"></script>
+    <script src="Build/UnityLoader.js"></script>
+  </head>
+  <body>
+    <div id="webgl-content" class="unity-desktop">
+      <div id="unityContainer" style="width: 450px; height: 800px"></div>
+        <script>
+            //JS CALLBACK
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            function isIOS() {
+                if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            function isAndroid() {
+                return (/android/i.test(userAgent));
+            }
+            function sendMessageToUnity(message) {
+                if (isIOS()) {
+                    try {
+                        webkit.messageHandlers.UnityInAppBrowser.postMessage(message);
+                    } catch (err) {
+                        console.log('Can not reach native code');
+                    }
+                } else if (isAndroid()) {
+                    UnityInAppBrowser.sendMessageFromJS(message);
+                }
+            }
+            //SEND MESSAGE
+            function ExitGame() {
+                //window.location.href = "ayos://Exit";
+                sendMessageToUnity("Exit");
+            }
+            function PlayBGM() {
+                //window.location.href = "ayos://PlayBGM"
+                sendMessageToUnity("PlayBGM");
+            }
+            function EnableBGM() {
+                //window.location.href = "ayos://ToggleBGM?status=On";
+                sendMessageToUnity("ToggleBGMOn");
+            }
+            function DisableBGM() {
+                //window.location.href = "ayos://ToggleBGM?status=Off";
+                sendMessageToUnity("ToggleBGMOff");
+            }
+            ///PROFILE MESSAGES
+            ///
+            ///messages sent from game to Ayos app
+            function GetAvatar() {
+                sendMessageToUnity("GetAvatar");
+            }
+            function GetBalance() {
+                sendMessageToUnity("GetWallet");
+            }
+            function CreditGems(amount) {
+                sendMessageToUnity("Credit:" + amount);
+            }
+            function DebitGems(amount) {
+                sendMessageToUnity("Debit:" + amount);
+            }
+
+            //UNITY LOADER AND RESPONSIVENESS
+            var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Holen.json", { onProgress: UnityProgress });
+
+            var canvas = document.querySelector("#unityContainer");
+            var content = document.querySelector("#webgl-content");
+            function Resize() {
+                try {
+                    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                        content.className = "unity-mobile";
+                        canvas.style.width = "100%";
+                        canvas.style.height = "100%";
+                    } else {
+                        canvas.style.width = "450px";
+                        canvas.style.height = "800px";
+                    }
+                } catch (err) {
+                    alert("Error in Responsiveness | Error: " + err.message);
+                }
+            }
+            Resize();
+
+            function UnityProgress(unityInstance, progress) {
+                if (!unityInstance.Module)
+                    return;
+                if (!unityInstance.logo) {
+                    unityInstance.logo = document.createElement("div");
+                    unityInstance.logo.className = "logo " + unityInstance.Module.splashScreenStyle;
+                    unityInstance.container.appendChild(unityInstance.logo);
+                }
+                if (!unityInstance.progress) {
+                    unityInstance.progress = document.createElement("div");
+                    unityInstance.progress.className = "progress " + unityInstance.Module.splashScreenStyle;
+                    unityInstance.progress.empty = document.createElement("div");
+                    unityInstance.progress.empty.className = "empty";
+                    unityInstance.progress.appendChild(unityInstance.progress.empty);
+                    unityInstance.progress.full = document.createElement("div");
+                    unityInstance.progress.full.className = "full";
+                    unityInstance.progress.appendChild(unityInstance.progress.full);
+                    unityInstance.container.appendChild(unityInstance.progress);
+                }
+                unityInstance.progress.full.style.width = (100 * progress) + "%";
+                unityInstance.progress.empty.style.width = (100 * (1 - progress)) + "%";
+                if (progress == 1) {
+                    unityInstance.logo.style.display = unityInstance.progress.style.display = "none";
+                    Resize();
+                }
+
+                ///RETRIEVAL CALLBACKS
+                ///
+                ///data retrieved from Ayos app
+                ///being sent back to the game  
+                function RetrieveWallet(balance) {
+                    unityInstance.SendMessage("[Bridge]", "RetrieveWallet", balance);
+                }
+                function RetrieveAvatar(response) {
+                    unityInstance.SendMessage("[Bridge]", "RetrieveAvatar", response);
+                }
+            }
+        </script>
+    </div>
+  </body>
+</html>
