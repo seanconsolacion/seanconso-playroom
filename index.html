@@ -70,7 +70,7 @@
             }
 
             //UNITY LOADER AND RESPONSIVENESS
-            var unityInstance = UnityLoader.instantiate("unityContainer", "Build/_builds.json", { onProgress: UnityProgress });
+            var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Holen.json", { onProgress: UnityProgress });
 
             var canvas = document.querySelector("#unityContainer");
             var content = document.querySelector("#webgl-content");
@@ -114,19 +114,18 @@
                 if (progress == 1) {
                     unityInstance.logo.style.display = unityInstance.progress.style.display = "none";
                     Resize();
-                    <!-- PlayBGM(); -->
                 }
-            }
 
-            ///RETRIEVAL CALLBACKS
-            ///
-            ///data retrieved from Ayos app
-            ///being sent back to the game  
-            function RetrieveWallet(balance) {
-                unityInstance.SendMessage("[Bridge]", "RetrieveWallet", balance);
-            }
-            function RetrieveAvatar(response) {
-                unityInstance.SendMessage("[Bridge]", "RetrieveAvatar", response);
+                ///RETRIEVAL CALLBACKS
+                ///
+                ///data retrieved from Ayos app
+                ///being sent back to the game  
+                function RetrieveWallet(balance) {
+                    unityInstance.SendMessage("[Bridge]", "RetrieveWallet", balance);
+                }
+                function RetrieveAvatar(response) {
+                    unityInstance.SendMessage("[Bridge]", "RetrieveAvatar", response);
+                }
             }
         </script>
     </div>
