@@ -13,7 +13,7 @@
     <!-- </script> -->
   </head>
   <body>
-    <div class="webgl-content" class="unity-desktop">
+    <div id="webgl-content" class="unity-desktop">
       <div id="unityContainer" style="width: 450px; height: 800px"></div>
 	  <script>
             var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -72,7 +72,7 @@
             }
 
             //UNITY LOADER AND RESPONSIVENESS
-            var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Build (06-09-2021_1442).json", { onProgress: UnityProgress });
+            var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Holen.json", { onProgress: UnityProgress });
 
             var canvas = document.querySelector("#unityContainer");
             var content = document.querySelector("#webgl-content");
