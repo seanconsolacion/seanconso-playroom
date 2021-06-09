@@ -8,12 +8,14 @@
     <link rel="stylesheet" href="TemplateData/style.css">
     <script src="TemplateData/UnityProgress.js"></script>
     <script src="Build/UnityLoader.js"></script>
+    <!-- <script> -->
+      <!-- var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Holen.json", {onProgress: UnityProgress}); -->
+    <!-- </script> -->
   </head>
   <body>
-    <div id="webgl-content" class="unity-desktop">
+    <div class="webgl-content" class="unity-desktop">
       <div id="unityContainer" style="width: 450px; height: 800px"></div>
-        <script>
-            //JS CALLBACK
+	  <script>
             var userAgent = navigator.userAgent || navigator.vendor || window.opera;
             function isIOS() {
                 if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
@@ -70,7 +72,7 @@
             }
 
             //UNITY LOADER AND RESPONSIVENESS
-            var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Holen.json", { onProgress: UnityProgress });
+            var unityInstance = UnityLoader.instantiate("unityContainer", "Build/Build (06-09-2021_1442).json", { onProgress: UnityProgress });
 
             var canvas = document.querySelector("#unityContainer");
             var content = document.querySelector("#webgl-content");
@@ -114,20 +116,26 @@
                 if (progress == 1) {
                     unityInstance.logo.style.display = unityInstance.progress.style.display = "none";
                     Resize();
-                }
-
-                ///RETRIEVAL CALLBACKS
-                ///
-                ///data retrieved from Ayos app
-                ///being sent back to the game  
-                function RetrieveWallet(balance) {
-                    unityInstance.SendMessage("[Bridge]", "RetrieveWallet", balance);
-                }
-                function RetrieveAvatar(response) {
-                    unityInstance.SendMessage("[Bridge]", "RetrieveAvatar", response);
+                    PlayBGM();
                 }
             }
+
+            ///RETRIEVAL CALLBACKS
+            ///
+            ///data retrieved from Ayos app
+            ///being sent back to the game  
+            function RetrieveWallet(balance) {
+                unityInstance.SendMessage("[Bridge]", "RetrieveWallet", balance);
+            }
+            function RetrieveAvatar(response) {
+                unityInstance.SendMessage("[Bridge]", "RetrieveAvatar", response);
+            }
         </script>
+      <div class="footer">
+        <div class="webgl-logo"></div>
+        <div class="fullscreen" onclick="unityInstance.SetFullscreen(1)"></div>
+        <div class="title">Holen</div>
+      </div>
     </div>
   </body>
 </html>
