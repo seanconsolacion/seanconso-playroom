@@ -1,6 +1,6 @@
 {
-"companyName": "Multisys Technologies Corporation",
-"productName": "Holen",
+"companyName": "DefaultCompany",
+"productName": "Holen3",
 "productVersion": "0.1",
 "dataUrl": "Holen.data.unityweb",
 "wasmCodeUrl": "Holen.wasm.code.unityweb",
@@ -8,7 +8,7 @@
 "graphicsAPI": ["WebGL 2.0","WebGL 1.0"],
 "webglContextAttributes": {"preserveDrawingBuffer": false},
 "splashScreenStyle": "Dark",
-"backgroundColor": "#FFFFFF",
+"backgroundColor": "#231F20",
 "cacheControl": {"default": "must-revalidate"},
 "developmentBuild": false,
 "multithreading": false,
