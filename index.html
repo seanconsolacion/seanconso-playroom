@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | Patintero</title>
+    <title>Unity WebGL Player | Ayos</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=960 height=600></canvas>
+      <canvas id="unity-canvas" width=450 height=900></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -20,7 +20,7 @@
       <div id="unity-footer">
         <div id="unity-webgl-logo"></div>
         <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">Patintero</div>
+        <div id="unity-build-title">Ayos</div>
       </div>
     </div>
     <script>
@@ -56,15 +56,15 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/virtual-booth.loader.js";
+      var loaderUrl = buildUrl + "/Jack n poy WebGL.loader.js";
       var config = {
-        dataUrl: buildUrl + "/virtual-booth.data",
-        frameworkUrl: buildUrl + "/virtual-booth.framework.js",
-        codeUrl: buildUrl + "/virtual-booth.wasm",
+        dataUrl: buildUrl + "/Jack n poy WebGL.data",
+        frameworkUrl: buildUrl + "/Jack n poy WebGL.framework.js",
+        codeUrl: buildUrl + "/Jack n poy WebGL.wasm",
         streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "Patintero",
-        productVersion: "0.1",
+        companyName: "Multisys Technologies Corporation",
+        productName: "Ayos",
+        productVersion: "1.9.1",
         showBanner: unityShowBanner,
       };
 
@@ -93,8 +93,8 @@
       } else {
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
 
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
+        canvas.style.width = "450px";
+        canvas.style.height = "900px";
       }
 
       loadingBar.style.display = "block";
