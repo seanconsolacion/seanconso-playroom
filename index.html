@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | Ayos</title>
+    <title>Unity WebGL Player | gamebox-jacknpoy</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
@@ -16,20 +16,59 @@
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-      <div id="unity-warning"> </div>
-      <div id="unity-footer">
-        <div id="unity-webgl-logo"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">Ayos</div>
-      </div>
     </div>
     <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        function isIOS() {
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function isAndroid() {
+            return (/android/i.test(userAgent));
+        }
+        function sendMessageToUnity(message) {
+            if (isIOS()) {
+                try {
+                    webkit.messageHandlers.UnityInAppBrowser.postMessage(message);
+                } catch (err) {
+                    console.log('[IOS] Cannot reach native code');
+                }
+            } else if (isAndroid()) {
+                UnityInAppBrowser.sendMessageFromJS(message);
+            }
+        }
+        function ExitGame(val) {
+            if (urlParams.has('lobby')) {
+                var lob = urlParams.get('lobby');
+                window.location.href = lob;
+            } else {
+                if (isIOS()) {
+                    try {
+                        window.location.href = "ayos://Exit?code=" + val;
+                    } catch (err) {
+                        console.log('[EXIT][IOS] Cannot exit: ' + err.message);
+                    }
+                } else if (isAndroid()) {
+                    try {
+                        sendMessageToUnity("Exit=" + val);
+                    } catch (err) {
+                        console.log('[EXIT][ANDROID] Cannot exit: ' + err.message);
+                    }
+                }
+            }
+            //ELSE exit unity webview
+        }
+
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
       var progressBarFull = document.querySelector("#unity-progress-bar-full");
-      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
-      var warningBanner = document.querySelector("#unity-warning");
 
       // Shows a temporary message banner/ribbon for a few seconds, or
       // a permanent error message on top of the canvas if type=='error'.
@@ -37,23 +76,23 @@
       // Modify or remove this function to customize the visually presented
       // way that non-critical warnings and error messages are presented to the
       // user.
-      function unityShowBanner(msg, type) {
-        function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-        }
-        var div = document.createElement('div');
-        div.innerHTML = msg;
-        warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
-        else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function() {
-            warningBanner.removeChild(div);
-            updateBannerVisibility();
-          }, 5000);
-        }
-        updateBannerVisibility();
-      }
+      //function unityShowBanner(msg, type) {
+      //  function updateBannerVisibility() {
+      //    warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+      //  }
+      //  var div = document.createElement('div');
+      //  div.innerHTML = msg;
+      //  warningBanner.appendChild(div);
+      //  if (type == 'error') div.style = 'background: red; padding: 10px;';
+      //  else {
+      //    if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+      //    setTimeout(function() {
+      //      warningBanner.removeChild(div);
+      //      updateBannerVisibility();
+      //    }, 5000);
+      //  }
+      //  updateBannerVisibility();
+      //}
 
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/virtual-booth.loader.js";
@@ -64,9 +103,9 @@
         symbolsUrl: buildUrl + "/virtual-booth.symbols.json",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Multisys Technologies Corporation",
-        productName: "Ayos",
+        productName: "gamebox-jacknpoy",
         productVersion: "1.9.1",
-        showBanner: unityShowBanner,
+        //showBanner: unityShowBanner,
       };
 
       // By default Unity keeps WebGL canvas render target size matched with
@@ -106,10 +145,45 @@
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
-          loadingBar.style.display = "none";
-          fullscreenButton.onclick = () => {
-            unityInstance.SetFullscreen(1);
-          };
+            loadingBar.style.display = "none";
+            var data = urlParams.get('auth') + "&" + urlParams.get('uuid');
+            unityInstance.SendMessage("[Bridge]", "SetData", data);
+
+            var hidden, visibilityChange;
+            var isPageVisible = true;
+
+            if (typeof document.hidden !== "undefined") {
+                hidden = "hidden";
+                visibilityChange = "visibilitychange";
+            } else if (typeof document["msHidden"] !== "undefined") {
+                hidden = "msHidden";
+                visibilityChange = "msvisibilitychange";
+            } else if (typeof document["webkitHidden"] !== "undefined") {
+                hidden = "webkitHidden";
+                visibilityChange = "webkitvisibilitychange";
+            }
+
+            function handleVisibilityChange(hiddenState, reason) {
+                if (hiddenState) {
+                    if (isPageVisible) {
+                        console.log('visibility: hidden', reason);
+                        isPageVisible = false;
+                        unityInstance.SendMessage("[Bridge]", "TogglePause", "PAUSED");
+                    }
+                } else {
+                    console.log('visibility: restored', reason);
+                    isPageVisible = true;
+                    unityInstance.SendMessage("[Bridge]", "TogglePause", "UNPAUSED");
+                }
+            }
+
+            if (typeof document.addEventListener === "undefined" || typeof document[hidden] === "undefined") {
+                console.log("Browser doesn't support the Page visibility API.");
+            } else {
+                document.addEventListener(visibilityChange, () => handleVisibilityChange(document.hidden), false);
+                window.addEventListener("focus", () => handleVisibilityChange(false, 'focus'));
+                window.addEventListener("blur", () => handleVisibilityChange(true, 'blur'));
+            }
         }).catch((message) => {
           alert(message);
         });
