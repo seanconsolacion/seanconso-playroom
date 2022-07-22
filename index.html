@@ -22,10 +22,45 @@
         const urlParams = new URLSearchParams(queryString);
 
         var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        function ExitGame() {
+        function isIOS() {
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function isAndroid() {
+            return (/android/i.test(userAgent));
+        }
+        function sendMessageToUnity(message) {
+            if (isIOS()) {
+                try {
+                    webkit.messageHandlers.UnityInAppBrowser.postMessage(message);
+                } catch (err) {
+                    console.log('[IOS] Cannot reach native code');
+                }
+            } else if (isAndroid()) {
+                UnityInAppBrowser.sendMessageFromJS(message);
+            }
+        }
+        function ExitGame(val) {
             if (urlParams.has('lobby')) {
                 var lob = urlParams.get('lobby');
                 window.location.href = lob;
+            } else {
+                if (isIOS()) {
+                    try {
+                        window.location.href = "ayos://Exit?code=" + val;
+                    } catch (err) {
+                        console.log('[EXIT][IOS] Cannot exit: ' + err.message);
+                    }
+                } else if (isAndroid()) {
+                    try {
+                        sendMessageToUnity("Exit=" + val);
+                    } catch (err) {
+                        console.log('[EXIT][ANDROID] Cannot exit: ' + err.message);
+                    }
+                }
             }
             //ELSE exit unity webview
         }
@@ -41,23 +76,23 @@
       // Modify or remove this function to customize the visually presented
       // way that non-critical warnings and error messages are presented to the
       // user.
-      function unityShowBanner(msg, type) {
-        function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-        }
-        var div = document.createElement('div');
-        div.innerHTML = msg;
-        warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
-        else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function() {
-            warningBanner.removeChild(div);
-            updateBannerVisibility();
-          }, 5000);
-        }
-        updateBannerVisibility();
-      }
+      //function unityShowBanner(msg, type) {
+      //  function updateBannerVisibility() {
+      //    warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+      //  }
+      //  var div = document.createElement('div');
+      //  div.innerHTML = msg;
+      //  warningBanner.appendChild(div);
+      //  if (type == 'error') div.style = 'background: red; padding: 10px;';
+      //  else {
+      //    if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+      //    setTimeout(function() {
+      //      warningBanner.removeChild(div);
+      //      updateBannerVisibility();
+      //    }, 5000);
+      //  }
+      //  updateBannerVisibility();
+      //}
 
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/virtual-booth.loader.js";
@@ -69,7 +104,7 @@
         companyName: "Multisys Technologies Corporation",
         productName: "Ayos",
         productVersion: "1.9.1",
-        showBanner: unityShowBanner,
+        //showBanner: unityShowBanner,
       };
 
       // By default Unity keeps WebGL canvas render target size matched with
@@ -132,12 +167,12 @@
                     if (isPageVisible) {
                         console.log('visibility: hidden', reason);
                         isPageVisible = false;
-                        unityInstance.SendMessage("[Bridge]", "TogglePause", isPageVisible);
+                        unityInstance.SendMessage("[Bridge]", "TogglePause", "PAUSED");
                     }
                 } else {
                     console.log('visibility: restored', reason);
                     isPageVisible = true;
-                    unityInstance.SendMessage("[Bridge]", "TogglePause", isPageVisible);
+                    unityInstance.SendMessage("[Bridge]", "TogglePause", "UNPAUSED");
                 }
             }
 
