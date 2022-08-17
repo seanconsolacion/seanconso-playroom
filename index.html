@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Ayos | Gamebox - Holen</title>
+    <title>Unity WebGL Player | Gamebox - Holen</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
@@ -43,21 +43,19 @@
                 UnityInAppBrowser.sendMessageFromJS(message);
             }
         }
-        function ExitGame(val, token) {
+        function ExitGame(val) {
             if (urlParams.has('lobby')) {
-                var lob = urlParams.get('lobby') + '/?' + urlParams.get('partner_id');
-                window.location.href = lob + '&token=' + token;
+                var lob = urlParams.get('lobby');
+                window.location.href = lob;
             } else {
                 if (isIOS()) {
                     try {
-                        alert('[EXIT][IOS] Exiting with code: ' + val);
                         window.location.href = "ayos://Exit?code=" + val;
                     } catch (err) {
-                        alert('[EXIT][IOS] Cannot exit: ' + err.message);
+                        console.log('[EXIT][IOS] Cannot exit: ' + err.message);
                     }
                 } else if (isAndroid()) {
                     try {
-                        alert('[EXIT][ANDROID] Exiting with code: ' + val);
                         sendMessageToUnity("Exit=" + val);
                     } catch (err) {
                         console.log('[EXIT][ANDROID] Cannot exit: ' + err.message);
@@ -97,12 +95,12 @@
       //}
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/virtual-booth.loader.js";
+      var loaderUrl = buildUrl + "/Holen Builds.loader.js";
       var config = {
-        dataUrl: buildUrl + "/virtual-booth.data",
-        frameworkUrl: buildUrl + "/virtual-booth.framework.js",
-        codeUrl: buildUrl + "/virtual-booth.wasm",
-        symbolsUrl: buildUrl + "/virtual-booth.symbols.json",
+        dataUrl: buildUrl + "/Holen Builds.data",
+        frameworkUrl: buildUrl + "/Holen Builds.framework.js",
+        codeUrl: buildUrl + "/Holen Builds.wasm",
+        symbolsUrl: buildUrl + "/Holen Builds.symbols.json",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Multisys Technologies Corporation",
         productName: "Gamebox - Holen",
@@ -168,12 +166,12 @@
             function handleVisibilityChange(hiddenState, reason) {
                 if (hiddenState) {
                     if (isPageVisible) {
-                        //console.log('visibility: hidden', reason);
+                        console.log('visibility: hidden', reason);
                         isPageVisible = false;
                         unityInstance.SendMessage("[Bridge]", "TogglePause", "PAUSED");
                     }
                 } else {
-                    //console.log('visibility: restored', reason);
+                    console.log('visibility: restored', reason);
                     isPageVisible = true;
                     unityInstance.SendMessage("[Bridge]", "TogglePause", "UNPAUSED");
                 }
